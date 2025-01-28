@@ -45,16 +45,17 @@ func New(
 	opts ...ModuleOption,
 ) *Module {
 	module := Module{
-		BaseModule:      modules.New("celestials"),
-		address:         address,
-		states:          state,
-		tx:              tx,
-		celestials:      v1.New(celestialsDatasource.URL),
-		indexerName:     indexerName,
-		network:         network,
-		indexPeriod:     time.Minute,
-		databaseTimeout: time.Minute,
-		limit:           100,
+		BaseModule:           modules.New("celestials"),
+		address:              address,
+		states:               state,
+		tx:                   tx,
+		celestials:           v1.New(celestialsDatasource.URL),
+		indexerName:          indexerName,
+		network:              network,
+		indexPeriod:          time.Minute,
+		databaseTimeout:      time.Minute,
+		limit:                100,
+		celestialsDatasource: celestialsDatasource,
 	}
 
 	for i := range opts {
@@ -133,6 +134,8 @@ func (m *Module) getChanges(ctx context.Context) (celestials.Changes, error) {
 }
 
 func (m *Module) sync(ctx context.Context) error {
+	m.Log.Debug().Msg("start syncing...")
+
 	var end bool
 
 	for !end {
@@ -179,6 +182,8 @@ func (m *Module) sync(ctx context.Context) error {
 		}
 		end = len(changes.Changes) < int(m.limit)
 	}
+
+	m.Log.Debug().Msg("end syncing...")
 	return nil
 }
 
