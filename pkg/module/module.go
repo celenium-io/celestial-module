@@ -10,27 +10,28 @@ import (
 	v1 "github.com/celenium-io/celestial-module/pkg/api/v1"
 	"github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/celenium-io/celestial-module/pkg/storage/postgres"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/dipdup-net/go-lib/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
+
+type AddressHandler func(ctx context.Context, address string) (uint64, error)
 
 type Module struct {
 	modules.BaseModule
 
-	celestialsApi celestials.API
-	address       IdByHash
-	states        storage.ICelestialState
-	celestials    storage.ICelestial
-	tx            sdk.Transactable
-	state         storage.CelestialState
+	celestialsApi  celestials.API
+	addressHandler AddressHandler
+	states         storage.ICelestialState
+	celestials     storage.ICelestial
+	tx             sdk.Transactable
+	state          storage.CelestialState
 
 	celestialsDatasource config.DataSource
 	indexerName          string
 	network              string
-	prefix               string
 	indexPeriod          time.Duration
 	databaseTimeout      time.Duration
 	limit                int64
@@ -38,7 +39,7 @@ type Module struct {
 
 func New(
 	celestialsDatasource config.DataSource,
-	address IdByHash,
+	addressHandler AddressHandler,
 	celestials storage.ICelestial,
 	state storage.ICelestialState,
 	tx sdk.Transactable,
@@ -48,7 +49,6 @@ func New(
 ) *Module {
 	module := Module{
 		BaseModule:           modules.New("celestials"),
-		address:              address,
 		celestials:           celestials,
 		states:               state,
 		tx:                   tx,
@@ -59,6 +59,7 @@ func New(
 		databaseTimeout:      time.Minute,
 		limit:                100,
 		celestialsDatasource: celestialsDatasource,
+		addressHandler:       addressHandler,
 	}
 
 	for i := range opts {
@@ -76,6 +77,9 @@ func (m *Module) Close() error {
 }
 
 func (m *Module) Start(ctx context.Context) {
+	if m.addressHandler == nil {
+		panic("nil address handler")
+	}
 	if err := m.getState(ctx); err != nil {
 		m.Log.Err(err).Msg("state receiving")
 		return
@@ -146,6 +150,10 @@ func (m *Module) sync(ctx context.Context) error {
 		if err != nil {
 			return errors.Wrap(err, "get changes")
 		}
+		log.Info().
+			Int("changes_count", len(changes.Changes)).
+			Int64("head", changes.Head).
+			Msg("received changes")
 
 		cids := make(map[string]storage.Celestial)
 		addressIds := make(map[uint64]struct{})
@@ -155,22 +163,9 @@ func (m *Module) sync(ctx context.Context) error {
 				continue
 			}
 			m.state.ChangeId = changes.Changes[i].ChangeID
-
-			prefix, hash, err := bech32.DecodeAndConvert(changes.Changes[i].Address)
+			addressId, err := m.addressHandler(ctx, changes.Changes[i].Address)
 			if err != nil {
-				return errors.Wrapf(err, "decoding address %s", changes.Changes[i].Address)
-			}
-			if m.prefix != "" && prefix != m.prefix {
-				return errors.Errorf("invalid address prefix %s", changes.Changes[i].Address)
-			}
-
-			addressId, err := m.address.IdByHash(ctx, hash)
-			if err != nil {
-				return errors.Wrap(err, "address by hash")
-			}
-
-			if len(addressId) == 0 {
-				return errors.Errorf("can't find address %s", changes.Changes[i].Address)
+				return errors.Wrap(err, "address handler")
 			}
 
 			status, err := storage.ParseStatus(changes.Changes[i].Status)
@@ -179,13 +174,13 @@ func (m *Module) sync(ctx context.Context) error {
 			}
 
 			if status == storage.StatusPRIMARY {
-				addressIds[addressId[0]] = struct{}{}
+				addressIds[addressId] = struct{}{}
 			}
 
 			cids[changes.Changes[i].CelestialID] = storage.Celestial{
 				Id:        changes.Changes[i].CelestialID,
 				ImageUrl:  changes.Changes[i].ImageURL,
-				AddressId: addressId[0],
+				AddressId: addressId,
 				ChangeId:  changes.Changes[i].ChangeID,
 				Status:    status,
 			}
@@ -194,6 +189,11 @@ func (m *Module) sync(ctx context.Context) error {
 		if err := m.save(ctx, cids, addressIds); err != nil {
 			return errors.Wrap(err, "save")
 		}
+		log.Debug().
+			Int("changes_count", len(cids)).
+			Int64("head", m.state.ChangeId).
+			Msg("saved changes")
+
 		end = len(changes.Changes) < int(m.limit)
 	}
 

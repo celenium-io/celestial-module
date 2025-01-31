@@ -8,7 +8,6 @@ import (
 
 	celestials "github.com/celenium-io/celestial-module/pkg/api"
 	celestialsMock "github.com/celenium-io/celestial-module/pkg/api/mock"
-	"github.com/celenium-io/celestial-module/pkg/module/mock"
 	"github.com/celenium-io/celestial-module/pkg/storage"
 	pg "github.com/celenium-io/celestial-module/pkg/storage/postgres"
 	"github.com/dipdup-net/go-lib/config"
@@ -32,7 +31,6 @@ type ModuleTestSuite struct {
 	celestialState *pg.CelestialState
 	ctrl           *gomock.Controller
 	api            *celestialsMock.MockAPI
-	address        *mock.MockIdByHash
 }
 
 // SetupSuite -
@@ -79,7 +77,6 @@ func (s *ModuleTestSuite) SetupSuite() {
 
 	s.ctrl = gomock.NewController(s.T())
 	s.api = celestialsMock.NewMockAPI(s.ctrl)
-	s.address = mock.NewMockIdByHash(s.ctrl)
 }
 
 // TearDownSuite -
@@ -126,11 +123,6 @@ func (s *ModuleTestSuite) TestSync() {
 			},
 		}, nil)
 
-	s.address.EXPECT().
-		IdByHash(gomock.Any(), gomock.Any()).
-		Return([]uint64{1}, nil).
-		Times(1)
-
 	cfgDs := config.DataSource{
 		Kind:              "celestials",
 		URL:               "base_url",
@@ -143,13 +135,14 @@ func (s *ModuleTestSuite) TestSync() {
 
 	m := New(
 		cfgDs,
-		s.address,
+		func(ctx context.Context, address string) (uint64, error) {
+			return 1, nil
+		},
 		s.celestials,
 		s.celestialState,
 		s.storage.Transactable,
 		testIndexerName,
 		network,
-		WithAddressPrefix("celestia"),
 		WithLimit(10),
 	)
 	m.celestialsApi = s.api

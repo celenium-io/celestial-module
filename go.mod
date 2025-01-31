@@ -2,15 +2,9 @@ module github.com/celenium-io/celestial-module
 
 go 1.23.2
 
-replace (
-	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v1.25.1-sdk-v0.46.16
-	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	github.com/tendermint/tendermint => github.com/celestiaorg/celestia-core v1.43.0-tm-v0.34.35
-)
+replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 require (
-	github.com/cosmos/cosmos-sdk v0.46.16
 	github.com/dipdup-net/go-lib v0.4.7
 	github.com/dipdup-net/indexer-sdk v0.0.6
 	github.com/go-testfixtures/testfixtures/v3 v3.14.0
@@ -47,7 +41,6 @@ require (
 	github.com/containerd/containerd v1.7.18 // indirect
 	github.com/containerd/errdefs v0.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
-	github.com/cosmos/btcutil v1.0.5 // indirect
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dipdup-io/workerpool v0.0.4 // indirect

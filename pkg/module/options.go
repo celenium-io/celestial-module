@@ -4,12 +4,6 @@ import "time"
 
 type ModuleOption func(*Module)
 
-func WithAddressPrefix(prefix string) ModuleOption {
-	return func(m *Module) {
-		m.prefix = prefix
-	}
-}
-
 func WithIndexPeriod(period time.Duration) ModuleOption {
 	return func(m *Module) {
 		m.indexPeriod = period
