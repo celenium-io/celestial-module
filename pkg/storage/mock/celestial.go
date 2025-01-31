@@ -117,3 +117,42 @@ func (c *MockICelestialByIdCall) DoAndReturn(f func(context.Context, string) (st
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
+
+// Primary mocks base method.
+func (m *MockICelestial) Primary(ctx context.Context, addressId uint64) (storage.Celestial, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Primary", ctx, addressId)
+	ret0, _ := ret[0].(storage.Celestial)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Primary indicates an expected call of Primary.
+func (mr *MockICelestialMockRecorder) Primary(ctx, addressId any) *MockICelestialPrimaryCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Primary", reflect.TypeOf((*MockICelestial)(nil).Primary), ctx, addressId)
+	return &MockICelestialPrimaryCall{Call: call}
+}
+
+// MockICelestialPrimaryCall wrap *gomock.Call
+type MockICelestialPrimaryCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockICelestialPrimaryCall) Return(arg0 storage.Celestial, arg1 error) *MockICelestialPrimaryCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockICelestialPrimaryCall) Do(f func(context.Context, uint64) (storage.Celestial, error)) *MockICelestialPrimaryCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockICelestialPrimaryCall) DoAndReturn(f func(context.Context, uint64) (storage.Celestial, error)) *MockICelestialPrimaryCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}

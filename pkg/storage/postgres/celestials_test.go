@@ -41,6 +41,9 @@ func (s *CelestialsTestSuite) SetupSuite() {
 	s.psqlContainer = psqlContainer
 
 	init := func(ctx context.Context, conn *database.Bun) error {
+		if err := CreateTypes(ctx, conn); err != nil {
+			return err
+		}
 		if err := database.CreateTables(ctx, conn, new(storage.Celestial), new(storage.CelestialState)); err != nil {
 			if err := conn.Close(); err != nil {
 				return err
@@ -118,6 +121,19 @@ func (s *CelestialsTestSuite) TestCelestialsByAddressId() {
 	s.Require().EqualValues(1, item.AddressId)
 }
 
+func (s *CelestialsTestSuite) TestCelestialsPrimary() {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer ctxCancel()
+
+	item, err := s.celestials.Primary(ctx, 1)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues("", item.ImageUrl)
+	s.Require().EqualValues("name 1", item.Id)
+	s.Require().EqualValues(1, item.ChangeId)
+	s.Require().EqualValues(1, item.AddressId)
+}
+
 func (s *CelestialsTestSuite) TestCelestialsTransaction() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer ctxCancel()
@@ -134,14 +150,19 @@ func (s *CelestialsTestSuite) TestCelestialsTransaction() {
 			AddressId: 1,
 			ChangeId:  4,
 			ImageUrl:  "image_url",
+			Status:    storage.StatusPRIMARY,
 		}, {
 			Id:        "name 4",
 			AddressId: 3,
 			ChangeId:  5,
 			ImageUrl:  "image_url2",
+			Status:    storage.StatusPRIMARY,
 		},
 	}
 	state.ChangeId = celIds[1].ChangeId
+
+	err = tx.UpdateStatusForAddress(ctx, slices.Values([]uint64{1, 3}))
+	s.Require().NoError(err)
 
 	err = tx.SaveCelestials(ctx, slices.Values(celIds))
 	s.Require().NoError(err)
@@ -162,6 +183,7 @@ func (s *CelestialsTestSuite) TestCelestialsTransaction() {
 	s.Require().EqualValues("name 3", item.Id)
 	s.Require().EqualValues(4, item.ChangeId)
 	s.Require().EqualValues(1, item.AddressId)
+	s.Require().EqualValues(storage.StatusPRIMARY, item.Status)
 
 	item2, err := s.celestials.ById(ctx, "name 4")
 	s.Require().NoError(err)
@@ -169,6 +191,15 @@ func (s *CelestialsTestSuite) TestCelestialsTransaction() {
 	s.Require().EqualValues("name 4", item2.Id)
 	s.Require().EqualValues(5, item2.ChangeId)
 	s.Require().EqualValues(3, item2.AddressId)
+	s.Require().EqualValues(storage.StatusPRIMARY, item.Status)
+
+	item3, err := s.celestials.ById(ctx, "name 1")
+	s.Require().NoError(err)
+	s.Require().EqualValues("", item3.ImageUrl)
+	s.Require().EqualValues("name 1", item3.Id)
+	s.Require().EqualValues(1, item3.ChangeId)
+	s.Require().EqualValues(1, item3.AddressId)
+	s.Require().EqualValues(storage.StatusVERIFIED, item3.Status)
 }
 
 func (s *CelestialsTestSuite) TestCelestialsStateSave() {

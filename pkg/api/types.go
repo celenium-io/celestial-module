@@ -10,4 +10,5 @@ type Change struct {
 	Address     string `json:"address"`
 	ImageURL    string `json:"image_url,omitempty"`
 	ChangeID    int64  `json:"change_id"`
+	Status      string `json:"status"`
 }

@@ -20,11 +20,12 @@ import (
 type Module struct {
 	modules.BaseModule
 
-	celestials celestials.API
-	address    IdByHash
-	states     storage.ICelestialState
-	tx         sdk.Transactable
-	state      storage.CelestialState
+	celestialsApi celestials.API
+	address       IdByHash
+	states        storage.ICelestialState
+	celestials    storage.ICelestial
+	tx            sdk.Transactable
+	state         storage.CelestialState
 
 	celestialsDatasource config.DataSource
 	indexerName          string
@@ -38,6 +39,7 @@ type Module struct {
 func New(
 	celestialsDatasource config.DataSource,
 	address IdByHash,
+	celestials storage.ICelestial,
 	state storage.ICelestialState,
 	tx sdk.Transactable,
 	indexerName string,
@@ -47,9 +49,10 @@ func New(
 	module := Module{
 		BaseModule:           modules.New("celestials"),
 		address:              address,
+		celestials:           celestials,
 		states:               state,
 		tx:                   tx,
-		celestials:           v1.New(celestialsDatasource.URL),
+		celestialsApi:        v1.New(celestialsDatasource.URL),
 		indexerName:          indexerName,
 		network:              network,
 		indexPeriod:          time.Minute,
@@ -124,7 +127,7 @@ func (m *Module) getChanges(ctx context.Context) (celestials.Changes, error) {
 	requestCtx, cancel := context.WithTimeout(ctx, time.Second*time.Duration(m.celestialsDatasource.Timeout))
 	defer cancel()
 
-	return m.celestials.Changes(
+	return m.celestialsApi.Changes(
 		requestCtx,
 		m.network,
 		celestials.WithFromChangeId(m.state.ChangeId),
@@ -145,6 +148,7 @@ func (m *Module) sync(ctx context.Context) error {
 		}
 
 		cids := make(map[string]storage.Celestial)
+		addressIds := make(map[uint64]struct{})
 
 		for i := range changes.Changes {
 			if m.state.ChangeId >= changes.Changes[i].ChangeID {
@@ -169,15 +173,25 @@ func (m *Module) sync(ctx context.Context) error {
 				return errors.Errorf("can't find address %s", changes.Changes[i].Address)
 			}
 
+			status, err := storage.ParseStatus(changes.Changes[i].Status)
+			if err != nil {
+				return err
+			}
+
+			if status == storage.StatusPRIMARY {
+				addressIds[addressId[0]] = struct{}{}
+			}
+
 			cids[changes.Changes[i].CelestialID] = storage.Celestial{
 				Id:        changes.Changes[i].CelestialID,
 				ImageUrl:  changes.Changes[i].ImageURL,
 				AddressId: addressId[0],
 				ChangeId:  changes.Changes[i].ChangeID,
+				Status:    status,
 			}
 		}
 
-		if err := m.save(ctx, cids); err != nil {
+		if err := m.save(ctx, cids, addressIds); err != nil {
 			return errors.Wrap(err, "save")
 		}
 		end = len(changes.Changes) < int(m.limit)
@@ -187,7 +201,7 @@ func (m *Module) sync(ctx context.Context) error {
 	return nil
 }
 
-func (m *Module) save(ctx context.Context, cids map[string]storage.Celestial) error {
+func (m *Module) save(ctx context.Context, cids map[string]storage.Celestial, addressIds map[uint64]struct{}) error {
 	requestCtx, cancel := context.WithTimeout(ctx, m.databaseTimeout)
 	defer cancel()
 
@@ -196,6 +210,10 @@ func (m *Module) save(ctx context.Context, cids map[string]storage.Celestial) er
 		return errors.Wrap(err, "begin transactions")
 	}
 	defer tx.Close(requestCtx)
+
+	if err := tx.UpdateStatusForAddress(ctx, maps.Keys(addressIds)); err != nil {
+		return tx.HandleError(requestCtx, errors.Wrap(err, "update primary statuses"))
+	}
 
 	if err := tx.SaveCelestials(requestCtx, maps.Values(cids)); err != nil {
 		return tx.HandleError(requestCtx, errors.Wrap(err, "save celestials"))

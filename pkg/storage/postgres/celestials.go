@@ -40,3 +40,12 @@ func (c *Celestials) ByAddressId(ctx context.Context, addressId uint64, limit, o
 	err = query.Limit(limit).Scan(ctx)
 	return
 }
+
+func (c *Celestials) Primary(ctx context.Context, addressId uint64) (result storage.Celestial, err error) {
+	err = c.DB().NewSelect().
+		Model(&result).
+		Where("address_id = ?", addressId).
+		Where("status = ?", storage.StatusPRIMARY).
+		Scan(ctx)
+	return
+}

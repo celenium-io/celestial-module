@@ -11,6 +11,7 @@ package mock
 
 import (
 	context "context"
+	iter "iter"
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestial-module/pkg/storage"
@@ -353,22 +354,17 @@ func (c *MockCelestialTransactionRollbackCall) DoAndReturn(f func(context.Contex
 }
 
 // SaveCelestials mocks base method.
-func (m *MockCelestialTransaction) SaveCelestials(ctx context.Context, celestials ...storage.Celestial) error {
+func (m *MockCelestialTransaction) SaveCelestials(ctx context.Context, celestials iter.Seq[storage.Celestial]) error {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
-	for _, a := range celestials {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SaveCelestials", varargs...)
+	ret := m.ctrl.Call(m, "SaveCelestials", ctx, celestials)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SaveCelestials indicates an expected call of SaveCelestials.
-func (mr *MockCelestialTransactionMockRecorder) SaveCelestials(ctx any, celestials ...any) *MockCelestialTransactionSaveCelestialsCall {
+func (mr *MockCelestialTransactionMockRecorder) SaveCelestials(ctx, celestials any) *MockCelestialTransactionSaveCelestialsCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, celestials...)
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveCelestials", reflect.TypeOf((*MockCelestialTransaction)(nil).SaveCelestials), varargs...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveCelestials", reflect.TypeOf((*MockCelestialTransaction)(nil).SaveCelestials), ctx, celestials)
 	return &MockCelestialTransactionSaveCelestialsCall{Call: call}
 }
 
@@ -384,13 +380,13 @@ func (c *MockCelestialTransactionSaveCelestialsCall) Return(arg0 error) *MockCel
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCelestialTransactionSaveCelestialsCall) Do(f func(context.Context, ...storage.Celestial) error) *MockCelestialTransactionSaveCelestialsCall {
+func (c *MockCelestialTransactionSaveCelestialsCall) Do(f func(context.Context, iter.Seq[storage.Celestial]) error) *MockCelestialTransactionSaveCelestialsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCelestialTransactionSaveCelestialsCall) DoAndReturn(f func(context.Context, ...storage.Celestial) error) *MockCelestialTransactionSaveCelestialsCall {
+func (c *MockCelestialTransactionSaveCelestialsCall) DoAndReturn(f func(context.Context, iter.Seq[storage.Celestial]) error) *MockCelestialTransactionSaveCelestialsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -505,6 +501,49 @@ func (c *MockCelestialTransactionUpdateStateCall) Do(f func(context.Context, *st
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockCelestialTransactionUpdateStateCall) DoAndReturn(f func(context.Context, *storage.CelestialState) error) *MockCelestialTransactionUpdateStateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// UpdateStatusForAddress mocks base method.
+func (m *MockCelestialTransaction) UpdateStatusForAddress(ctx context.Context, addressId ...iter.Seq[uint64]) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range addressId {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateStatusForAddress", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateStatusForAddress indicates an expected call of UpdateStatusForAddress.
+func (mr *MockCelestialTransactionMockRecorder) UpdateStatusForAddress(ctx any, addressId ...any) *MockCelestialTransactionUpdateStatusForAddressCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, addressId...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatusForAddress", reflect.TypeOf((*MockCelestialTransaction)(nil).UpdateStatusForAddress), varargs...)
+	return &MockCelestialTransactionUpdateStatusForAddressCall{Call: call}
+}
+
+// MockCelestialTransactionUpdateStatusForAddressCall wrap *gomock.Call
+type MockCelestialTransactionUpdateStatusForAddressCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockCelestialTransactionUpdateStatusForAddressCall) Return(arg0 error) *MockCelestialTransactionUpdateStatusForAddressCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockCelestialTransactionUpdateStatusForAddressCall) Do(f func(context.Context, ...iter.Seq[uint64]) error) *MockCelestialTransactionUpdateStatusForAddressCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockCelestialTransactionUpdateStatusForAddressCall) DoAndReturn(f func(context.Context, ...iter.Seq[uint64]) error) *MockCelestialTransactionUpdateStatusForAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

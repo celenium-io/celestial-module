@@ -51,6 +51,9 @@ func (s *ModuleTestSuite) SetupSuite() {
 	s.psqlContainer = psqlContainer
 
 	init := func(ctx context.Context, conn *database.Bun) error {
+		if err := pg.CreateTypes(ctx, conn); err != nil {
+			return err
+		}
 		if err := database.CreateTables(ctx, conn, new(storage.Celestial), new(storage.CelestialState)); err != nil {
 			if err := conn.Close(); err != nil {
 				return err
@@ -118,6 +121,7 @@ func (s *ModuleTestSuite) TestSync() {
 					Address:     "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8",
 					ImageURL:    "image_url",
 					ChangeID:    4,
+					Status:      "PRIMARY",
 				},
 			},
 		}, nil)
@@ -140,6 +144,7 @@ func (s *ModuleTestSuite) TestSync() {
 	m := New(
 		cfgDs,
 		s.address,
+		s.celestials,
 		s.celestialState,
 		s.storage.Transactable,
 		testIndexerName,
@@ -147,7 +152,7 @@ func (s *ModuleTestSuite) TestSync() {
 		WithAddressPrefix("celestia"),
 		WithLimit(10),
 	)
-	m.celestials = s.api
+	m.celestialsApi = s.api
 
 	err = m.getState(ctx)
 	s.Require().NoError(err)
