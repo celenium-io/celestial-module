@@ -187,10 +187,10 @@ func (m *Module) sync(ctx context.Context) error {
 			lastId = changes.Changes[i].ChangeID
 		}
 
+		m.state.ChangeId = lastId
 		if err := m.save(ctx, cids, addressIds); err != nil {
 			return errors.Wrap(err, "save")
 		}
-		m.state.ChangeId = lastId
 		log.Debug().
 			Int("changes_count", len(cids)).
 			Int64("head", m.state.ChangeId).
