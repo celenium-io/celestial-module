@@ -158,11 +158,11 @@ func (m *Module) sync(ctx context.Context) error {
 		cids := make(map[string]storage.Celestial)
 		addressIds := make(map[uint64]struct{})
 
+		var lastId int64
 		for i := range changes.Changes {
 			if m.state.ChangeId >= changes.Changes[i].ChangeID {
 				continue
 			}
-			m.state.ChangeId = changes.Changes[i].ChangeID
 			addressId, err := m.addressHandler(ctx, changes.Changes[i].Address)
 			if err != nil {
 				return errors.Wrap(err, "address handler")
@@ -184,11 +184,13 @@ func (m *Module) sync(ctx context.Context) error {
 				ChangeId:  changes.Changes[i].ChangeID,
 				Status:    status,
 			}
+			lastId = changes.Changes[i].ChangeID
 		}
 
 		if err := m.save(ctx, cids, addressIds); err != nil {
 			return errors.Wrap(err, "save")
 		}
+		m.state.ChangeId = lastId
 		log.Debug().
 			Int("changes_count", len(cids)).
 			Int64("head", m.state.ChangeId).
