@@ -163,6 +163,7 @@ func (m *Module) sync(ctx context.Context) error {
 			if m.state.ChangeId >= changes.Changes[i].ChangeID {
 				continue
 			}
+			lastId = changes.Changes[i].ChangeID
 
 			status, err := storage.ParseStatus(changes.Changes[i].Status)
 			if err != nil {
@@ -187,17 +188,19 @@ func (m *Module) sync(ctx context.Context) error {
 				ChangeId:  changes.Changes[i].ChangeID,
 				Status:    status,
 			}
-			lastId = changes.Changes[i].ChangeID
 		}
 
-		m.state.ChangeId = lastId
-		if err := m.save(ctx, cids, addressIds); err != nil {
-			return errors.Wrap(err, "save")
+		if lastId > m.state.ChangeId {
+			m.state.ChangeId = lastId
+
+			if err := m.save(ctx, cids, addressIds); err != nil {
+				return errors.Wrap(err, "save")
+			}
+			log.Debug().
+				Int("changes_count", len(cids)).
+				Int64("head", m.state.ChangeId).
+				Msg("saved changes")
 		}
-		log.Debug().
-			Int("changes_count", len(cids)).
-			Int64("head", m.state.ChangeId).
-			Msg("saved changes")
 
 		end = len(changes.Changes) < int(m.limit)
 	}
