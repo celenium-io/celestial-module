@@ -1,6 +1,6 @@
 module github.com/celenium-io/celestial-module
 
-go 1.23.2
+go 1.24.4
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 

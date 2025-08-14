@@ -171,10 +171,8 @@ func (m *Module) sync(ctx context.Context) error {
 			}
 			addressId, err := m.addressHandler(ctx, changes.Changes[i].Address)
 			if err != nil {
-				if status == storage.StatusNOTVERIFIED {
-					continue
-				}
-				return errors.Wrap(err, "address handler")
+				m.Log.Err(err).Msg("address handler")
+				continue
 			}
 
 			if status == storage.StatusPRIMARY {
