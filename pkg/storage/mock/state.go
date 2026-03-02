@@ -21,6 +21,7 @@ import (
 type MockICelestialState struct {
 	ctrl     *gomock.Controller
 	recorder *MockICelestialStateMockRecorder
+	isgomock struct{}
 }
 
 // MockICelestialStateMockRecorder is the mock recorder for MockICelestialState.

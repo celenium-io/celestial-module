@@ -15,7 +15,7 @@ import (
 	reflect "reflect"
 
 	storage "github.com/celenium-io/celestial-module/pkg/storage"
-	storage0 "github.com/dipdup-net/indexer-sdk/pkg/storage"
+	pgx "github.com/jackc/pgx/v5"
 	bun "github.com/uptrace/bun"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -24,6 +24,7 @@ import (
 type MockCelestialTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockCelestialTransactionMockRecorder
+	isgomock struct{}
 }
 
 // MockCelestialTransactionMockRecorder is the mock recorder for MockCelestialTransaction.
@@ -157,44 +158,6 @@ func (c *MockCelestialTransactionCloseCall) DoAndReturn(f func(context.Context) 
 	return c
 }
 
-// CopyFrom mocks base method.
-func (m *MockCelestialTransaction) CopyFrom(ctx context.Context, tableName string, data []storage0.Copiable) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CopyFrom", ctx, tableName, data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CopyFrom indicates an expected call of CopyFrom.
-func (mr *MockCelestialTransactionMockRecorder) CopyFrom(ctx, tableName, data any) *MockCelestialTransactionCopyFromCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyFrom", reflect.TypeOf((*MockCelestialTransaction)(nil).CopyFrom), ctx, tableName, data)
-	return &MockCelestialTransactionCopyFromCall{Call: call}
-}
-
-// MockCelestialTransactionCopyFromCall wrap *gomock.Call
-type MockCelestialTransactionCopyFromCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockCelestialTransactionCopyFromCall) Return(arg0 error) *MockCelestialTransactionCopyFromCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockCelestialTransactionCopyFromCall) Do(f func(context.Context, string, []storage0.Copiable) error) *MockCelestialTransactionCopyFromCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCelestialTransactionCopyFromCall) DoAndReturn(f func(context.Context, string, []storage0.Copiable) error) *MockCelestialTransactionCopyFromCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // Exec mocks base method.
 func (m *MockCelestialTransaction) Exec(ctx context.Context, query string, params ...any) (int64, error) {
 	m.ctrl.T.Helper()
@@ -311,6 +274,44 @@ func (c *MockCelestialTransactionHandleErrorCall) Do(f func(context.Context, err
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockCelestialTransactionHandleErrorCall) DoAndReturn(f func(context.Context, error) error) *MockCelestialTransactionHandleErrorCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Pool mocks base method.
+func (m *MockCelestialTransaction) Pool() *pgx.Conn {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Pool")
+	ret0, _ := ret[0].(*pgx.Conn)
+	return ret0
+}
+
+// Pool indicates an expected call of Pool.
+func (mr *MockCelestialTransactionMockRecorder) Pool() *MockCelestialTransactionPoolCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pool", reflect.TypeOf((*MockCelestialTransaction)(nil).Pool))
+	return &MockCelestialTransactionPoolCall{Call: call}
+}
+
+// MockCelestialTransactionPoolCall wrap *gomock.Call
+type MockCelestialTransactionPoolCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockCelestialTransactionPoolCall) Return(arg0 *pgx.Conn) *MockCelestialTransactionPoolCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockCelestialTransactionPoolCall) Do(f func() *pgx.Conn) *MockCelestialTransactionPoolCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockCelestialTransactionPoolCall) DoAndReturn(f func() *pgx.Conn) *MockCelestialTransactionPoolCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
