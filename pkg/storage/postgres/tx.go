@@ -50,7 +50,7 @@ func (tx CelestialTransaction) UpdateStatusForAddress(ctx context.Context, addre
 	_, err := tx.Tx().NewUpdate().
 		Model((*storage.Celestial)(nil)).
 		Set("status = ?", storage.StatusVERIFIED).
-		Where("address_id IN (?)", bun.In(slices.Collect(addressId))).
+		Where("address_id IN ?", bun.Tuple(slices.Collect(addressId))).
 		Where("status = ?", storage.StatusPRIMARY).
 		Exec(ctx)
 	return err

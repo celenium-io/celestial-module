@@ -14,7 +14,7 @@ const (
 	createTypeQuery = `DO $$
 	BEGIN
 		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ?) THEN
-			CREATE TYPE ? AS ENUM (?);
+			CREATE TYPE ? AS ENUM ?;
 		END IF;
 	END$$;`
 )
@@ -27,7 +27,7 @@ func CreateTypes(ctx context.Context, conn *database.Bun) error {
 			createTypeQuery,
 			"celestials_status",
 			bun.Safe("celestials_status"),
-			bun.In(storage.StatusValues()),
+			bun.Tuple(storage.StatusValues()),
 		); err != nil {
 			return err
 		}

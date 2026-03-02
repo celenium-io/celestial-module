@@ -90,7 +90,7 @@ func (s *ModuleTestSuite) TearDownSuite() {
 }
 
 func (s *ModuleTestSuite) TestSync() {
-	db, err := sql.Open("postgres", s.psqlContainer.GetDSN())
+	db, err := sql.Open("pgx", s.psqlContainer.GetDSN())
 	s.Require().NoError(err)
 
 	fixtures, err := testfixtures.New(
