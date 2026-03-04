@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/database"
 )
 
 type Celestials struct {

@@ -10,7 +10,7 @@ import (
 	v1 "github.com/celenium-io/celestial-module/pkg/api/v1"
 	"github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/celenium-io/celestial-module/pkg/storage/postgres"
-	"github.com/dipdup-net/go-lib/config"
+	"github.com/dipdup-io/go-lib/config"
 	"github.com/dipdup-net/indexer-sdk/pkg/modules"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/pkg/errors"
