@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/dipdup-net/go-lib/config"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/config"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"

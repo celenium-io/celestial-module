@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/celenium-io/celestial-module/pkg/storage"
-	"github.com/dipdup-net/go-lib/database"
+	"github.com/dipdup-io/go-lib/database"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
