@@ -10,6 +10,7 @@ import (
 	"github.com/celenium-io/celestial-module/pkg/storage"
 	"github.com/dipdup-io/go-lib/config"
 	"github.com/dipdup-io/go-lib/database"
+	"github.com/dipdup-io/go-lib/testhelpers"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"
@@ -18,7 +19,7 @@ import (
 // CelestialsTestSuite -
 type CelestialsTestSuite struct {
 	suite.Suite
-	psqlContainer *database.PostgreSQLContainer
+	psqlContainer *testhelpers.PostgreSQLContainer
 	storage       *postgres.Storage
 
 	celestials     *Celestials
@@ -30,7 +31,7 @@ func (s *CelestialsTestSuite) SetupSuite() {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer ctxCancel()
 
-	psqlContainer, err := database.NewPostgreSQLContainer(ctx, database.PostgreSQLContainerConfig{
+	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, testhelpers.PostgreSQLContainerConfig{
 		User:     "user",
 		Password: "password",
 		Database: "db_test",
