@@ -10,7 +10,7 @@ import (
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ICelestial interface {
 	ById(ctx context.Context, id string) (Celestial, error)
-	ByAddressId(ctx context.Context, addressId uint64, limit, offset int) ([]Celestial, error)
+	ByAddressId(ctx context.Context, addressId uint64, limit, offset int64) ([]Celestial, error)
 	Primary(ctx context.Context, addressId uint64) (Celestial, error)
 }
 

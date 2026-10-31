@@ -26,7 +26,7 @@ func (c *Celestials) ById(ctx context.Context, id string) (result storage.Celest
 	return
 }
 
-func (c *Celestials) ByAddressId(ctx context.Context, addressId uint64, limit, offset int) (result []storage.Celestial, err error) {
+func (c *Celestials) ByAddressId(ctx context.Context, addressId uint64, limit, offset int64) (result []storage.Celestial, err error) {
 	query := c.DB().NewSelect().
 		Model(&result).
 		Where("address_id = ?", addressId).
