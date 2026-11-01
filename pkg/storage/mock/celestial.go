@@ -42,7 +42,7 @@ func (m *MockICelestial) EXPECT() *MockICelestialMockRecorder {
 }
 
 // ByAddressId mocks base method.
-func (m *MockICelestial) ByAddressId(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Celestial, error) {
+func (m *MockICelestial) ByAddressId(ctx context.Context, addressId uint64, limit, offset int64) ([]storage.Celestial, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByAddressId", ctx, addressId, limit, offset)
 	ret0, _ := ret[0].([]storage.Celestial)
@@ -69,13 +69,13 @@ func (c *MockICelestialByAddressIdCall) Return(arg0 []storage.Celestial, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockICelestialByAddressIdCall) Do(f func(context.Context, uint64, int, int) ([]storage.Celestial, error)) *MockICelestialByAddressIdCall {
+func (c *MockICelestialByAddressIdCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Celestial, error)) *MockICelestialByAddressIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockICelestialByAddressIdCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Celestial, error)) *MockICelestialByAddressIdCall {
+func (c *MockICelestialByAddressIdCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Celestial, error)) *MockICelestialByAddressIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
