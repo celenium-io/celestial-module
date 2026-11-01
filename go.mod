@@ -6,9 +6,9 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 require (
 	github.com/dipdup-io/go-lib/config v1.0.1
-	github.com/dipdup-io/go-lib/database v1.0.4
+	github.com/dipdup-io/go-lib/database v1.0.5
 	github.com/dipdup-io/go-lib/testhelpers v1.0.0
-	github.com/dipdup-net/indexer-sdk v0.1.0
+	github.com/dipdup-net/indexer-sdk v0.1.1
 	github.com/go-testfixtures/testfixtures/v3 v3.19.0
 	github.com/goccy/go-json v0.10.5
 	github.com/jackc/pgx/v5 v5.12.0
@@ -32,7 +32,6 @@ require (
 	github.com/containerd/log v0.2.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
 	github.com/cpuguy83/dockercfg v0.3.2 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dipdup-io/workerpool v0.0.4 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/go-connections v0.8.2 // indirect
@@ -72,7 +71,6 @@ require (
 	github.com/moby/term v0.5.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.9 // indirect
